@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { assignmentQuizData } from "../../../../../data";
+import { useStore } from "@/lib/store";
 
 export default function QuizPage({ params }: { params: { id: string } }) {
   const id = Number(params.id);
@@ -11,6 +12,32 @@ export default function QuizPage({ params }: { params: { id: string } }) {
   const [answers, setAnswers] = useState<Record<number, number | null>>({});
   const [submitted, setSubmitted] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const { recordQuizAttempt, assignments } = useStore();
+
+  // Load any saved answers for this quiz from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(`studymate.quiz.${id}.answers`);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Record<number, number | null>;
+        setAnswers(parsed);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [id]);
+
+  // Persist answers as they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        `studymate.quiz.${id}.answers`,
+        JSON.stringify(answers)
+      );
+    } catch (e) {
+      // ignore
+    }
+  }, [answers, id]);
 
   const score = useMemo(() => {
     if (!quiz || !submitted) return 0;
@@ -47,9 +74,28 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     e.preventDefault();
     setSubmitted(true);
     setShowResult(true);
+    const total = quiz?.questions.length ?? 0;
+    const raw = quiz
+      ? quiz.questions.reduce((acc, q) => acc + (answers[q.id] === q.correctIndex ? 1 : 0), 0)
+      : 0;
+    const percent = total > 0 ? Math.round((raw / total) * 100) : 0;
+    // Record attempt in global store
+    recordQuizAttempt(id, percent);
+    // Save submission snapshot
+    try {
+      localStorage.setItem(
+        `studymate.quiz.${id}.result`,
+        JSON.stringify({ answers, raw, total, percent, at: new Date().toISOString() })
+      );
+    } catch (e) {
+      // ignore
+    }
   };
 
   const total = quiz.questions.length;
+  const currentAssignment = assignments.find((a) => a.id === id);
+  const attempts = currentAssignment?.attempts ?? 0;
+  const maxAttempts = currentAssignment?.maxAttempts ?? undefined;
 
   return (
     <div className="p-8">
@@ -58,6 +104,10 @@ export default function QuizPage({ params }: { params: { id: string } }) {
           <h1 className="text-2xl font-bold">{quiz.title}</h1>
           <p className="text-sm text-muted-foreground">
             {quiz.instructions} • Time limit: {quiz.timeLimitMinutes} minutes
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Attempts: {attempts}
+            {typeof maxAttempts === "number" ? `/${maxAttempts}` : ""}
           </p>
         </div>
         <Link className="text-primary underline" href="/dashboard/assignments">

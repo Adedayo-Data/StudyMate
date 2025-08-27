@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mycogniai
+    username: postgres
+    password: "0000"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    url: jdbc:postgresql://localhost:5432/mycogniai
+    user: postgres
+    password: "0000"
+
+server:
+  port: 8080
+
+gemini:
+  apiKey: "AIzaSyC_zyAePqRdZTqbhsrPyCWrECVaVIa7FEY"
+  model: "gemini-1.5-flash"
+
+jwt:
+  # base64-encoded secret; replace with a secure value via env var in production
+  secret: "VGhpcy1pczMtYS1zYWZlLXNob3J0LXNlY3JldC1jaGFuZ2UtaXQh"
+  expirationMillis: 86400000
+
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+
+logging:
+  level:
+    com.studymate: INFO
+    org.springframework.web: INFO

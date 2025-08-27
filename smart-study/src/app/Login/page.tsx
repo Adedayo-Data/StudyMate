@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { authApi } from "@/lib/api";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -20,10 +21,34 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login data:", formData);
+    
+    try {
+      const response = await authApi.login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.success && response.data) {
+        // Store the token in localStorage
+        authApi.setToken(response.data.token);
+        
+        // Store user data in localStorage for easy access
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Show success message
+        console.log('Login successful:', response.data.message);
+        
+        // Redirect to dashboard
+        window.location.href = '/dashboard';
+      } else {
+        alert(response.error || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred during login');
+    }
   };
 
   const handleSocialLogin = (provider: string) => {

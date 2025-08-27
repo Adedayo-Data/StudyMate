@@ -1,6 +1,42 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { progressApi } from "@/lib/api";
+import { useEffect, useState } from "react";
+
+interface DashboardStats {
+  activeCourses: number;
+  studyStreak: number;
+  completedLessons: number;
+  totalStudyHours: number;
+}
 
 const DashboardPage = () => {
+  const [stats, setStats] = useState<DashboardStats>({
+    activeCourses: 0,
+    studyStreak: 0,
+    completedLessons: 0,
+    totalStudyHours: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const response = await progressApi.getDashboardStats();
+        if (response.success && response.data) {
+          setStats(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardStats();
+  }, []);
+
   return (
     <div className="p-8">
       {/* Dashboard Header */}
@@ -31,8 +67,10 @@ const DashboardPage = () => {
             <h3 className="font-semibold">Active Courses</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">+2 from last month</p>
+            <div className="text-2xl font-bold">
+              {loading ? "..." : stats.activeCourses}
+            </div>
+            <p className="text-xs text-muted-foreground">Currently enrolled</p>
           </div>
         </div>
 
@@ -54,7 +92,9 @@ const DashboardPage = () => {
             <h3 className="font-semibold">Study Streak</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">12 days</div>
+            <div className="text-2xl font-bold">
+              {loading ? "..." : `${stats.studyStreak} days`}
+            </div>
             <p className="text-xs text-muted-foreground">Keep it up!</p>
           </div>
         </div>
@@ -77,7 +117,9 @@ const DashboardPage = () => {
             <h3 className="font-semibold">Completed</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">23</div>
+            <div className="text-2xl font-bold">
+              {loading ? "..." : stats.completedLessons}
+            </div>
             <p className="text-xs text-muted-foreground">Lessons completed</p>
           </div>
         </div>
@@ -100,8 +142,10 @@ const DashboardPage = () => {
             <h3 className="font-semibold">Study Time</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">47h</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <div className="text-2xl font-bold">
+              {loading ? "..." : `${stats.totalStudyHours}h`}
+            </div>
+            <p className="text-xs text-muted-foreground">Total hours</p>
           </div>
         </div>
       </div>

@@ -11,61 +11,8 @@ const AssignmentsPage = () => {
   const [activeFilter, setActiveFilter] = useState<
     "all" | "pending" | "in-progress" | "completed"
   >("all");
-  // Fallback static assignments (existing demo data)
-  const staticAssignments = [
-    {
-      id: 1,
-      title: "Linear Algebra Fundamentals Quiz",
-      course: "AI Fundamentals Mastery",
-      type: "Quiz",
-      dueDate: "2024-01-15",
-      status: "pending",
-      points: 100,
-      timeLimit: "45 minutes",
-      attempts: 0,
-      maxAttempts: 3,
-    },
-    {
-      id: 2,
-      title: "Python Functions Assignment",
-      course: "Python Programming Bootcamp",
-      type: "Assignment",
-      dueDate: "2024-01-20",
-      status: "in-progress",
-      points: 150,
-      timeLimit: "No limit",
-      attempts: 1,
-      maxAttempts: 5,
-    },
-    {
-      id: 3,
-      title: "Neural Network Implementation",
-      course: "AI Fundamentals Mastery",
-      type: "Project",
-      dueDate: "2024-01-25",
-      status: "pending",
-      points: 200,
-      timeLimit: "No limit",
-      attempts: 0,
-      maxAttempts: 3,
-    },
-    {
-      id: 4,
-      title: "Data Structures Final Exam",
-      course: "Data Structures & Algorithms",
-      type: "Exam",
-      dueDate: "2023-12-30",
-      status: "completed",
-      points: 250,
-      timeLimit: "2 hours",
-      attempts: 1,
-      maxAttempts: 1,
-      score: 92,
-    },
-  ];
-
-  const { assignments: dynamicAssignments } = useStore();
-  const assignments = [...dynamicAssignments, ...staticAssignments];
+  const { assignments: assignmentsFromStore, updateAssignment } = useStore();
+  const assignments = assignmentsFromStore;
   const selected = assignments.find((a: any) => a.id === viewAssignmentId);
 
   const pending = assignments.filter((a: any) => a.status === "pending");
@@ -259,7 +206,12 @@ const AssignmentsPage = () => {
                 View Details
               </Button>
               <Button size="sm" asChild>
-                <Link href={`/dashboard/assignments/${assignment.id}`}>
+                <Link
+                  href={`/dashboard/assignments/${assignment.id}`}
+                  onClick={() =>
+                    updateAssignment(assignment.id, { status: "in-progress" })
+                  }
+                >
                   {assignment.status === "in-progress" ? "Continue" : "Start"}
                 </Link>
               </Button>
@@ -354,7 +306,7 @@ const AssignmentsPage = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Upcoming Deadlines */}
-          <div className="bg-card border rounded-lg p-6">
+          {/* <div className="bg-card border rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-4">Upcoming Deadlines</h2>
             <div className="space-y-3">
               <div className="flex items-center space-x-3 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -381,10 +333,10 @@ const AssignmentsPage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Assignment Statistics */}
-          <div className="bg-card border rounded-lg p-6">
+          {/* <div className="bg-card border rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-4">Statistics</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -410,7 +362,7 @@ const AssignmentsPage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Study Tips */}
           <div className="bg-card border rounded-lg p-6">
@@ -446,7 +398,7 @@ const AssignmentsPage = () => {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span>Start assignments early to avoid rush</span>
+                <span>Start assignments only when you have taken the related course</span>
               </div>
               <div className="flex items-start space-x-2">
                 <svg

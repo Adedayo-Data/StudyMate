@@ -1,12 +1,57 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { notifications, userData } from "../../../data";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { authApi, User } from "@/lib/api";
+import { getIcon } from "../icons";
+
+// Mock notifications data - replace with real API call later
+const notifications = [
+  {
+    id: 1,
+    title: "Assignment Due",
+    message: "Math homework due tomorrow",
+    time: "2 hours ago",
+    unread: true
+  },
+  {
+    id: 2,
+    title: "New Course Available",
+    message: "Advanced Physics course is now available",
+    time: "1 day ago",
+    unread: false
+  }
+];
 
 const UserNav = () => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await authApi.getCurrentUser();
+        if (response.success && response.data) {
+          setUser(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -126,9 +171,9 @@ const UserNav = () => {
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
               <Avatar className="h-8 w-8">
-                <AvatarImage src={userData.avatar} />
+                <AvatarImage src={user?.profilePicture || "https://github.com/shadcn.png"} />
                 <AvatarFallback className="text-sm font-medium">
-                  {userData.initials}
+                  {user?.username?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -139,15 +184,15 @@ const UserNav = () => {
                 <div className="p-4 border-b">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={userData.avatar} />
+                      <AvatarImage src={user?.profilePicture || "https://github.com/shadcn.png"} />
                       <AvatarFallback className="text-sm font-medium">
-                        {userData.initials}
+                        {user?.username?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{userData.name}</p>
+                      <p className="font-medium truncate">{user?.username || "Loading..."}</p>
                       <p className="text-sm text-muted-foreground truncate">
-                        {userData.email}
+                        {user?.email || "Loading..."}
                       </p>
                     </div>
                   </div>
@@ -157,7 +202,8 @@ const UserNav = () => {
                     className="flex items-center w-full px-4 py-2 text-sm hover:bg-muted text-red-600"
                     onClick={() => {
                       setShowUserMenu(false);
-                      // Handle logout logic here
+                      authApi.clearToken();
+                      window.location.href = '/auth/login';
                     }}
                   >
                     <svg

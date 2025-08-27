@@ -1,16 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { userData } from "../../../data";
+import { authApi, User } from "@/lib/api";
 import { sidebarItems } from "../../constants/index";
 import { getIcon } from "../icons";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await authApi.getCurrentUser();
+        if (response.success && response.data) {
+          setUser(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r">
@@ -18,13 +34,13 @@ const Sidebar = () => {
       <div className="border-b p-4">
         <div className="flex items-center space-x-3">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={userData.avatar} />
+            <AvatarImage src={user?.profilePicture || "https://github.com/shadcn.png"} />
             <AvatarFallback className="text-sm font-medium">
-              {userData.initials}
+              {user?.username?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-xl font-medium truncate">{userData.name}</p>
+            <p className="text-xl font-medium truncate">{user?.username || "Loading..."}</p>
           </div>
         </div>
       </div>

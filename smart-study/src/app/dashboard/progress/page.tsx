@@ -31,8 +31,8 @@ const ProgressPage = () => {
             <h3 className="font-semibold">Total Study Time</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">127.5h</div>
-            <p className="text-xs text-muted-foreground">+12.3h this week</p>
+            <div className="text-2xl font-bold">2h</div>
+            <p className="text-xs text-muted-foreground">+0.5h this week</p>
           </div>
         </div>
 
@@ -54,8 +54,8 @@ const ProgressPage = () => {
             <h3 className="font-semibold">Lessons Completed</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">89</div>
-            <p className="text-xs text-muted-foreground">+23 this week</p>
+            <div className="text-2xl font-bold">2</div>
+            <p className="text-xs text-muted-foreground">+1 this week</p>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ const ProgressPage = () => {
             <h3 className="font-semibold">Current Streak</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">12 days</div>
+            <div className="text-2xl font-bold">1 days</div>
             <p className="text-xs text-muted-foreground">Personal best!</p>
           </div>
         </div>
@@ -100,7 +100,7 @@ const ProgressPage = () => {
             <h3 className="font-semibold">AI Interactions</h3>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold">156</div>
+            <div className="text-2xl font-bold">10</div>
             <p className="text-xs text-muted-foreground">Questions asked</p>
           </div>
         </div>
@@ -216,12 +216,12 @@ const ProgressPage = () => {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Study 40 hours</span>
-                  <span>32/40h</span>
+                  <span>2/40h</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full"
-                    style={{ width: "80%" }}
+                    style={{ width: "5%" }}
                   ></div>
                 </div>
               </div>
@@ -229,12 +229,12 @@ const ProgressPage = () => {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Complete 50 lessons</span>
-                  <span>38/50</span>
+                  <span>2/50</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full"
-                    style={{ width: "76%" }}
+                    style={{ width: "4%" }}
                   ></div>
                 </div>
               </div>
@@ -242,12 +242,12 @@ const ProgressPage = () => {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Maintain 20-day streak</span>
-                  <span>12/20 days</span>
+                  <span>1/20 days</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full"
-                    style={{ width: "60%" }}
+                    style={{ width: "5%" }}
                   ></div>
                 </div>
               </div>

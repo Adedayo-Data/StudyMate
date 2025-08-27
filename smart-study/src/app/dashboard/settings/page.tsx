@@ -1,19 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { authApi, User } from "@/lib/api";
 
 const SettingsPage = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    avatar: "",
+  });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await authApi.getCurrentUser();
+        if (response.success && response.data) {
+          setUser(response.data);
+          setProfile({
+            name: response.data.username || "",
+            email: response.data.email || "",
+            avatar: response.data.profilePicture || "https://github.com/shadcn.png",
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   const [activeTab, setActiveTab] = useState("profile");
   const [profileData, setProfileData] = useState({
-    fullName: "John Doe",
-    email: "john.doe@example.com",
-    username: "johndoe",
-    bio: "Passionate learner exploring AI and machine learning",
-    location: "San Francisco, CA",
-    website: "https://johndoe.dev",
+    fullName: "",
+    email: "",
+    username: "",
+    bio: "",
+    location: "",
+    website: "",
   });
+
+  // Update profileData when user data is fetched
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        fullName: user.fullName || "",
+        email: user.email || "",
+        username: user.username || "",
+        bio: "",
+        location: "",
+        website: "",
+      });
+    }
+  }, [user]);
 
   const [preferences, setPreferences] = useState({
     emailNotifications: true,

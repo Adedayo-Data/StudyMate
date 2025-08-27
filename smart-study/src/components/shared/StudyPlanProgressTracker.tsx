@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -44,6 +44,38 @@ const StudyPlanProgressTracker: React.FC<StudyPlanProgressTrackerProps> = ({
   const [currentWeek, setCurrentWeek] = useState(1);
   const [notes, setNotes] = useState("");
 
+  const storageKey = useMemo(() => `sp-state-${studyPlan.id}`, [studyPlan.id]);
+
+  // Load saved state from sessionStorage
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      if (raw) {
+        const saved = JSON.parse(raw) as {
+          milestones?: typeof milestones;
+          currentWeek?: number;
+          notes?: string;
+        };
+        if (Array.isArray(saved.milestones)) setMilestones(saved.milestones);
+        if (typeof saved.currentWeek === "number") setCurrentWeek(saved.currentWeek);
+        if (typeof saved.notes === "string") setNotes(saved.notes);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
+  const persist = (next?: Partial<{ milestones: typeof milestones; currentWeek: number; notes: string }>) => {
+    try {
+      const payload = {
+        milestones,
+        currentWeek,
+        notes,
+        ...(next || {}),
+      };
+      sessionStorage.setItem(storageKey, JSON.stringify(payload));
+    } catch {}
+  };
+
   const calculateProgress = () => {
     const completed = milestones.filter((m: Milestone) => m.completed).length;
     return Math.round((completed / milestones.length) * 100);
@@ -54,6 +86,8 @@ const StudyPlanProgressTracker: React.FC<StudyPlanProgressTrackerProps> = ({
       m.id === milestoneId ? { ...m, completed: !m.completed } : m
     );
     setMilestones(updatedMilestones);
+    // persist change
+    persist({ milestones: updatedMilestones });
     onUpdateProgress(
       milestoneId,
       !milestones.find((m: Milestone) => m.id === milestoneId)?.completed
@@ -74,7 +108,13 @@ const StudyPlanProgressTracker: React.FC<StudyPlanProgressTrackerProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-end mb-4 gap-5">
-          <Button variant="outline" onClick={() => onClose()}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              persist();
+              onClose();
+            }}
+          >
             Save Progress & Exit
           </Button>
           <Button variant="outline" onClick={onClose}>

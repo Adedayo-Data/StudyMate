@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import CreateStudyPlanForm from "@/components/shared/CreateStudyPlanForm";
 import StudyPlanDetails from "@/components/shared/StudyPlanDetails";
 import { studyPlansData, upcomingTasks } from "../../../../data";
+import type { StudyPlanFormData } from "@/types/types";
 
 const StudyPlansPage = () => {
   const router = useRouter();
@@ -13,8 +14,116 @@ const StudyPlansPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  const handleCreatePlan = (planData: any) => {
-    console.log("Creating new study plan:", planData);
+  const CREATED_KEY = "created-sp-plans";
+
+  const readCreated = (): any[] => {
+    try {
+      const raw = sessionStorage.getItem(CREATED_KEY);
+      if (!raw) return [];
+      const list = JSON.parse(raw);
+      return Array.isArray(list) ? list : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const writeCreated = (list: any[]) => {
+    try {
+      sessionStorage.setItem(CREATED_KEY, JSON.stringify(list));
+    } catch {}
+  };
+
+  const sessionProgress = (id: number): number | null => {
+    try {
+      const raw = sessionStorage.getItem(`sp-state-${id}`);
+      if (!raw) return null;
+      const saved = JSON.parse(raw) as { milestones?: Array<{ completed: boolean }>; };
+      if (Array.isArray(saved.milestones) && saved.milestones.length > 0) {
+        const completed = saved.milestones.filter((m) => m.completed).length;
+        return Math.round((completed / saved.milestones.length) * 100);
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const [overlayedPlans, setOverlayedPlans] = useState(() => {
+    const created = readCreated();
+    const base = [...studyPlansData, ...created];
+    return base.map((p) => {
+      const sp = sessionProgress(p.id);
+      return sp == null ? p : { ...p, progress: sp };
+    });
+  });
+
+  useEffect(() => {
+    const refresh = () => {
+      const created = readCreated();
+      const base = [...studyPlansData, ...created];
+      setOverlayedPlans(
+        base.map((p) => {
+          const sp = sessionProgress(p.id);
+          return sp == null ? p : { ...p, progress: sp };
+        })
+      );
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") refresh();
+    });
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh as any);
+    };
+  }, []);
+
+  const handleCreatePlan = (planData: StudyPlanFormData) => {
+    const created = readCreated();
+    const maxBaseId = studyPlansData.reduce((m, p) => Math.max(m, p.id), 0);
+    const maxCreatedId = created.reduce((m, p) => Math.max(m, Number(p.id) || 0), 0);
+    const newId = Math.max(maxBaseId, maxCreatedId) + 1;
+
+    // derive dueDate if possible
+    let dueDate = "";
+    try {
+      const weeks = parseInt((planData.duration || "").split(" ")[0]) || 0;
+      if (planData.startDate && weeks > 0) {
+        const d = new Date(planData.startDate);
+        d.setDate(d.getDate() + weeks * 7);
+        dueDate = d.toISOString().slice(0, 10);
+      }
+    } catch {}
+
+    const newPlan = {
+      id: newId,
+      title: planData.title,
+      description: planData.description,
+      duration: planData.duration || "",
+      progress: 0,
+      status: "active",
+      subjects: planData.subjects || [],
+      nextTask: "Start your first milestone",
+      dueDate: dueDate || planData.startDate || "",
+      difficulty: planData.difficulty,
+      studyHoursPerWeek: planData.studyHoursPerWeek,
+      startDate: planData.startDate,
+      goals: planData.goals,
+      prerequisites: planData.prerequisites,
+    };
+
+    const nextList = [...created, newPlan];
+    writeCreated(nextList);
+
+    // Update UI list with overlayed progress
+    const base = [...studyPlansData, ...nextList];
+    setOverlayedPlans(
+      base.map((p) => {
+        const sp = sessionProgress(p.id);
+        return sp == null ? p : { ...p, progress: sp };
+      })
+    );
+
     setShowCreateForm(false);
   };
 
@@ -62,7 +171,7 @@ const StudyPlansPage = () => {
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-xl font-semibold">Your Study Plans</h2>
 
-          {studyPlansData.map((plan) => (
+          {overlayedPlans.map((plan) => (
             <div key={plan.id} className="bg-card border rounded-lg p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">

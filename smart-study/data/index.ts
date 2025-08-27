@@ -40,11 +40,11 @@ export const notifications: Notification[] = [
   },
 ];
 
-// User Data
+// User Data - will be replaced with authenticated user data
 export const userData: User = {
-  name: "John Doe",
-  email: "john@example.com",
-  initials: "JD",
+  name: "Student",
+  email: "student@example.com",
+  initials: "ST",
   avatar: "https://github.com/shadcn.png",
 };
 
@@ -195,13 +195,13 @@ export const upcomingTasks = [
 
 // Progress Data
 export const weeklyData = [
-  { day: "Mon", hours: 2.5, completed: 3 },
-  { day: "Tue", hours: 3.2, completed: 4 },
-  { day: "Wed", hours: 1.8, completed: 2 },
-  { day: "Thu", hours: 4.1, completed: 5 },
-  { day: "Fri", hours: 2.9, completed: 3 },
-  { day: "Sat", hours: 3.5, completed: 4 },
-  { day: "Sun", hours: 2.1, completed: 2 },
+  { day: "Mon", hours: 0.5, completed: 1 },
+  { day: "Tue", hours: 0, completed: 0 },
+  { day: "Wed", hours: 0, completed: 0 },
+  { day: "Thu", hours: 1, completed: 1 },
+  { day: "Fri", hours: 0, completed: 0 },
+  { day: "Sat", hours: 0, completed: 0 },
+  { day: "Sun", hours: 0.5, completed: 0 },
 ];
 
 export const achievements = [
@@ -211,23 +211,23 @@ export const achievements = [
     description: "Completed your first course",
     icon: "🎓",
     earned: true,
-    date: "Dec 15, 2023",
+    date: "Aug 18, 2025",
   },
   {
     id: 2,
     title: "Study Streak Master",
     description: "Studied for 7 consecutive days",
     icon: "🔥",
-    earned: true,
-    date: "Dec 20, 2023",
+    earned: false,
+    progress: 2,
   },
   {
     id: 3,
     title: "AI Explorer",
     description: "Completed 5 AI-related lessons",
     icon: "🤖",
-    earned: true,
-    date: "Dec 25, 2023",
+    earned: false,
+    progress: 2,
   },
   {
     id: 4,
@@ -235,16 +235,16 @@ export const achievements = [
     description: "Complete 10 lessons in one day",
     icon: "⚡",
     earned: false,
-    progress: 70,
+    progress: 2,
   },
 ];
 
 export const subjects = [
-  { name: "Artificial Intelligence", progress: 75, color: "bg-blue-500" },
-  { name: "Machine Learning", progress: 60, color: "bg-green-500" },
+  // { name: "Artificial Intelligence", progress: 75, color: "bg-blue-500" },
+  // { name: "Machine Learning", progress: 60, color: "bg-green-500" },
   { name: "Python Programming", progress: 90, color: "bg-yellow-500" },
   { name: "Data Science", progress: 45, color: "bg-purple-500" },
-  { name: "Neural Networks", progress: 30, color: "bg-red-500" },
+  // { name: "Neural Networks", progress: 30, color: "bg-red-500" },
 ];
 
 // Assignments Data
@@ -331,6 +331,97 @@ export const assignmentQuizData: Record<number, AssignmentQuiz> = {
           "A scalar",
           "A transposed vector",
         ],
+        correctIndex: 1,
+      },
+    ],
+  },
+  2: {
+    assignmentId: 2,
+    title: "Python Functions Basics Quiz",
+    instructions:
+      "Choose the correct answers about Python functions and arguments.",
+    timeLimitMinutes: 10,
+    questions: [
+      {
+        id: 1,
+        prompt: "What keyword is used to define a function in Python?",
+        options: ["func", "def", "function", "lambda"],
+        correctIndex: 1,
+      },
+      {
+        id: 2,
+        prompt: "What is the correct way to specify a default argument?",
+        options: [
+          "def f(x: 1)",
+          "def f(x = 1)",
+          "f def(x=1)",
+          "function f(x=1)",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: 3,
+        prompt: "Which of these creates an anonymous function?",
+        options: ["def g(x): x+1", "lambda x: x + 1", "fn x => x+1", "func(x){x+1}"],
+        correctIndex: 1,
+      },
+    ],
+  },
+  3: {
+    assignmentId: 3,
+    title: "Neural Network Concepts Quiz",
+    instructions:
+      "Basic questions about neural networks and training.",
+    timeLimitMinutes: 12,
+    questions: [
+      {
+        id: 1,
+        prompt: "Which activation function can help with non-linearity?",
+        options: ["Identity", "ReLU", "Constant", "Linear"],
+        correctIndex: 1,
+      },
+      {
+        id: 2,
+        prompt: "Backpropagation primarily computes:",
+        options: [
+          "Layer outputs",
+          "Gradients of loss w.r.t. weights",
+          "Training accuracy",
+          "Learning rate",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: 3,
+        prompt: "To reduce overfitting you can use:",
+        options: ["Dropout", "Increase epochs", "Remove validation set", "Higher LR"],
+        correctIndex: 0,
+      },
+    ],
+  },
+  4: {
+    assignmentId: 4,
+    title: "Data Structures Final Quiz",
+    instructions:
+      "Quick check on arrays, trees, and complexity.",
+    timeLimitMinutes: 15,
+    questions: [
+      {
+        id: 1,
+        prompt: "Average time complexity of binary search on a sorted array:",
+        options: ["O(n)", "O(log n)", "O(1)", "O(n log n)"],
+        correctIndex: 1,
+      },
+      {
+        id: 2,
+        prompt: "A binary tree where every level is fully filled except possibly the last is:",
+        options: ["Full", "Perfect", "Complete", "Balanced"],
+        correctIndex: 2,
+      },
+      {
+        id: 3,
+        prompt: "Which data structure works on FIFO principle?",
+        options: ["Stack", "Queue", "Tree", "Graph"],
         correctIndex: 1,
       },
     ],
@@ -455,9 +546,9 @@ export const settingsTabs = [
 ];
 
 export const defaultProfileData = {
-  fullName: "John Doe",
-  email: "john.doe@example.com",
-  username: "johndoe",
+  fullName: "Student User",
+  email: "student@example.com",
+  username: "student",
   bio: "Passionate learner exploring AI and machine learning",
   location: "San Francisco, CA",
   website: "https://johndoe.dev",

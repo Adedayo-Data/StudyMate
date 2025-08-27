@@ -250,7 +250,8 @@ const StudyPlanDetails: React.FC<StudyPlanDetailsProps> = ({
           <CardTitle>Overall Progress</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Completion */}
             <div>
               <div className="flex justify-between mb-2">
                 <span>Completion</span>
@@ -258,18 +259,33 @@ const StudyPlanDetails: React.FC<StudyPlanDetailsProps> = ({
               </div>
               <Progress value={computeProgress()} />
             </div>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold">
-                  {isStudyPlan(studyPlan) ? studyPlan.completedHours || 0 : 0}
-                </p>
-                <p className="text-sm text-muted-foreground">Completed Hours</p>
+
+            {/* Minimal Subject Progress */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold">Subject Progress</h4>
               </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {isStudyPlan(studyPlan) ? studyPlan.totalHours || 0 : 0}
-                </p>
-                <p className="text-sm text-muted-foreground">Total Hours</p>
+              <div className="space-y-4">
+                {/* Python Programming */}
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Python Programming</span>
+                    <span>—</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full" style={{ width: "35%" }}></div>
+                  </div>
+                </div>
+                {/* Data Science */}
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Data Science</span>
+                    <span>—</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full" style={{ width: "20%" }}></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

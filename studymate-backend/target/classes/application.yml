@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: studymate-backend
+  profiles:
+    active: postgres
+
+# Keep CORS permissive for local dev; tighten in prod
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+
+logging:
+  level:
+    com.studymate: INFO
+    org.springframework.web: INFO

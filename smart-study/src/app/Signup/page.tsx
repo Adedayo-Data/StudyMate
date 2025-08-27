@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { authApi } from "@/lib/api";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -68,11 +69,36 @@ const SignupPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // Handle signup logic here
-      console.log("Signup data:", formData);
+      try {
+        const response = await authApi.signup({
+          username: formData.username,
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (response.success && response.data) {
+          // Store the token in localStorage
+          authApi.setToken(response.data.token);
+          
+          // Store user data in localStorage for easy access
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          
+          // Show success message
+          console.log('Signup successful:', response.data.message);
+          
+          // Redirect to dashboard
+          window.location.href = '/dashboard';
+        } else {
+          alert(response.error || 'Signup failed');
+        }
+      } catch (error) {
+        console.error('Signup error:', error);
+        alert('An error occurred during signup');
+      }
     }
   };
 
